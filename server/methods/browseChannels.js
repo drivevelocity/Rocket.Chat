@@ -96,7 +96,7 @@ Meteor.methods({
 		}
 
 		// type === users
-		if (!hasPermission(user._id, 'view-outside-room') || !hasPermission(user._id, 'view-d-room')) {
+		if (!hasPermission(user._id, 'view-d-room')) {
 			return;
 		}
 
@@ -117,7 +117,9 @@ Meteor.methods({
 		};
 
 		let result;
-		if (workspace === 'all') {
+		if (!hasPermission(user._id, 'view-outside-room')) {
+			result = Users.findPrivateActiveByUsernameOrNameRegexWithExceptions(user._id, text, exceptions, options);
+		} else if (workspace === 'all') {
 			result = Users.findByActiveUsersExcept(text, exceptions, options, forcedSearchFields);
 		} else if (workspace === 'external') {
 			result = Users.findByActiveExternalUsersExcept(text, exceptions, options, forcedSearchFields, getFederationDomain());

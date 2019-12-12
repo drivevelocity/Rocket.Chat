@@ -560,6 +560,44 @@ export class Users extends Base {
 		return this.find(query, options);
 	}
 
+	findPrivateActiveByUsernameOrNameRegexWithExceptions(uid, searchTerm, exceptions, options) {
+		if (exceptions == null) { exceptions = []; }
+		if (options == null) { options = {}; }
+		if (!_.isArray(exceptions)) {
+			exceptions = [exceptions];
+		}
+
+		const roomIds = Subscriptions.findByUserIdAndType(uid, 'p', { fields: { rid: 1 } }).fetch().map((s) => s.rid);
+		const userIds = Subscriptions.findByRoomIdsAndNotUserId(roomIds, uid).fetch().map((s) => s.u._id);
+		const termRegex = new RegExp(s.escapeRegExp(searchTerm), 'i');
+		const query = {
+			$or: [{
+				username: termRegex,
+			}, {
+				name: termRegex,
+			}],
+			active: true,
+			type: {
+				$in: ['user', 'bot'],
+			},
+			$and: [{
+				username: {
+					$exists: true,
+				},
+			}, {
+				username: {
+					$nin: exceptions,
+				},
+			}, {
+				_id: {
+					$in: userIds,
+				},
+			}],
+		};
+
+		return this.find(query, options);
+	}
+
 	findByActiveUsersExcept(searchTerm, exceptions, options, forcedSearchFields, extraQuery = []) {
 		if (exceptions == null) { exceptions = []; }
 		if (options == null) { options = {}; }

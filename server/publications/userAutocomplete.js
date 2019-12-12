@@ -14,10 +14,6 @@ Meteor.publish('userAutocomplete', function(selector) {
 		return this.ready();
 	}
 
-	if (!hasPermission(uid, 'view-outside-room')) {
-		return this.ready();
-	}
-
 	const options = {
 		fields: {
 			name: 1,
@@ -32,8 +28,7 @@ Meteor.publish('userAutocomplete', function(selector) {
 
 	const pub = this;
 	const exceptions = selector.exceptions || [];
-
-	const cursorHandle = Users.findActiveByUsernameOrNameRegexWithExceptions(selector.term, exceptions, options).observeChanges({
+	const handlers = {
 		added(_id, record) {
 			return pub.added('autocompleteRecords', _id, record);
 		},
@@ -43,7 +38,14 @@ Meteor.publish('userAutocomplete', function(selector) {
 		removed(_id, record) {
 			return pub.removed('autocompleteRecords', _id, record);
 		},
-	});
+	};
+
+	let cursorHandle;
+	if (hasPermission(uid, 'view-outside-room')) {
+		cursorHandle = Users.findActiveByUsernameOrNameRegexWithExceptions(selector.term, exceptions, options).observeChanges(handlers);
+	} else {
+		cursorHandle = Users.findPrivateActiveByUsernameOrNameRegexWithExceptions(this.userId, selector.term, exceptions, options).observeChanges(handlers);
+	}
 
 	this.ready();
 
