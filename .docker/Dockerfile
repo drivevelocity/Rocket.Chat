@@ -1,14 +1,11 @@
 FROM rocketchat/base:8
 
-ADD . /app
-
-MAINTAINER buildmaster@rocket.chat
+COPY --chown=rocketchat:rocketchat . /app
 
 RUN set -x \
  && cd /app/bundle/programs/server \
  && npm install \
- && npm cache clear --force \
- && chown -R rocketchat:rocketchat /app
+ && npm cache clear --force
 
 USER rocketchat
 
@@ -20,6 +17,7 @@ WORKDIR /app/bundle
 ENV DEPLOY_METHOD=docker \
     NODE_ENV=production \
     MONGO_URL=mongodb://mongo:27017/rocketchat \
+    MONGO_OPLOG_URL=mongodb://mongo:27017/local \
     HOME=/tmp \
     PORT=3000 \
     ROOT_URL=http://localhost:3000 \
