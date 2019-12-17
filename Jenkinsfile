@@ -32,7 +32,7 @@ node (label: 'linux') {
 
 				releaseVersion = gitVersion + ".${env.BUILD_NUMBER}"
 			}
-            stag ('Build') {
+            stage ('Build') {
                 sh './build-container.sh'
             }
 			stage ('Docker Publish') {
