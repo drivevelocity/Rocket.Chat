@@ -1,6 +1,6 @@
 # creates a nodejs app bundle
 set -x
-TMP=/home/$USER/tmp/rocketchat-build
+TMP=$(mktemp -ud -t rocketchat-build-XXXXXXXXXXXX --tmpdir=/home/$USER/tmp)
 rm -rf $TMP
 meteor build --directory $TMP
 
@@ -8,3 +8,4 @@ meteor build --directory $TMP
 cp ./Dockerfile $TMP
 cd $TMP
 docker build -t rocketchat-dc .
+rm -rf $TMP
