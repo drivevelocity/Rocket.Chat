@@ -9,5 +9,5 @@ meteor build --directory $TMP
 # create docker image
 cp ./Dockerfile $TMP
 cd $TMP
-docker build -t rocketchat-dc .
+docker build -t rocketchat .
 rm -rf $TMP
