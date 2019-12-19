@@ -19,10 +19,12 @@ ENV DEPLOY_METHOD=docker \
     MONGO_URL=mongodb://mongo:27017/rocketchat \
     MONGO_OPLOG_URL=mongodb://mongo:27017/local \
     HOME=/tmp \
-    PORT=3000 \
+    PORT=3001 \
     ROOT_URL=http://localhost:3000 \
+    INSTANCE_IP=127.0.0.1 \
+    CREATE_TOKENS_FOR_USERS=true \
     Accounts_AvatarStorePath=/app/uploads
 
-EXPOSE 3000
+EXPOSE 3001
 
 CMD ["node", "main.js"]
