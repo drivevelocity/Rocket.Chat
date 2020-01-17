@@ -7,7 +7,7 @@ import { lazyloadtick } from '../../lazy-load';
 import { SideNav, menu } from '../../ui-utils';
 import { settings } from '../../settings';
 import { roomTypes, getUserPreference } from '../../utils';
-import { Users } from '../../models';
+import { Users, Rooms } from '../../models';
 
 Template.sideNav.helpers({
 	flexTemplate() {
@@ -83,10 +83,19 @@ Template.sideNav.events({
 const redirectToDefaultChannelIfNeeded = () => {
 	const currentRouteState = FlowRouter.current();
 	const needToBeRedirect = ['/', '/home'];
+	if (!needToBeRedirect.includes(currentRouteState.path)) {
+		return;
+	}
+
 	const firstChannelAfterLogin = settings.get('First_Channel_After_Login');
 	const room = roomTypes.findRoom('c', firstChannelAfterLogin, Meteor.userId());
-	if (room && room._id && needToBeRedirect.includes(currentRouteState.path)) {
+	if (room && room._id) {
 		FlowRouter.go(`/channel/${ firstChannelAfterLogin }`);
+	} else {
+		const privateRoom = Rooms.findOne({ t: 'p', 'customFields.storeGroupId': { $exists: true } });
+		if (privateRoom) {
+			FlowRouter.go(`/group/${ privateRoom.name }`);
+		}
 	}
 };
 
