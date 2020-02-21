@@ -342,8 +342,8 @@ Meteor.startup(async function() {
 				});
 			});
 		},
-		condition({ subscription }) {
-			return Boolean(subscription);
+		condition() {
+			return false;
 		},
 		order: 17,
 		group: 'menu',
