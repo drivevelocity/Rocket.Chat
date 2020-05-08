@@ -28,6 +28,8 @@ Meteor.publish('userAutocomplete', function(selector) {
 
 	const pub = this;
 	const exceptions = selector.exceptions || [];
+	const conditions = selector.conditions || {};
+
 	const handlers = {
 		added(_id, record) {
 			return pub.added('autocompleteRecords', _id, record);
@@ -42,9 +44,9 @@ Meteor.publish('userAutocomplete', function(selector) {
 
 	let cursorHandle;
 	if (hasPermission(uid, 'view-outside-room')) {
-		cursorHandle = Users.findActiveByUsernameOrNameRegexWithExceptions(selector.term, exceptions, options).observeChanges(handlers);
+		cursorHandle = Users.findActiveByUsernameOrNameRegexWithExceptionsAndConditions(selector.term, exceptions, conditions, options).observeChanges(handlers);
 	} else {
-		cursorHandle = Users.findPrivateActiveByUsernameOrNameRegexWithExceptions(this.userId, selector.term, exceptions, options).observeChanges(handlers);
+		cursorHandle = Users.findPrivateActiveByUsernameOrNameRegexWithExceptions(this.userId, selector.term, conditions, exceptions, options).observeChanges(handlers);
 	}
 
 	this.ready();
