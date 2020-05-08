@@ -1,4 +1,4 @@
-FROM rocketchat/base:8
+FROM rocketchat/base:12.16.1
 
 COPY --chown=rocketchat:rocketchat . /app
 
