@@ -7,7 +7,7 @@ meteor npm install
 meteor build --directory $TMP
 
 # create docker image
-cp ./Dockerfile $TMP
+cp ./.docker/Dockerfile $TMP
 cd $TMP
 docker build -t rocketchat .
 rm -rf $TMP
