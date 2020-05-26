@@ -224,6 +224,8 @@ Template.messagePopupConfig.helpers({
 
 				// If needed, add to list the online users
 				if (items.length < 5 && filterRegex) {
+					const user = Meteor.users.findOne(Meteor.userId(), { fields: { username: 1, 'customFields.groupId': 1 } });
+					const { customFields: { groupId } = {} } = user || {};
 					const usernamesAlreadyFetched = items.map(({ username }) => username);
 					if (!hasAllPermission('view-outside-room')) {
 						const usernamesFromDMs = Subscriptions
@@ -255,6 +257,9 @@ Template.messagePopupConfig.helpers({
 									username: {
 										$in: usernamesFromDMs,
 									},
+									'customFields.groupId': {
+										$in: [groupId, null],
+									},
 								},
 								{
 									fields: {
@@ -276,7 +281,6 @@ Template.messagePopupConfig.helpers({
 
 						items.push(...newItems);
 					} else {
-						const user = Meteor.users.findOne(Meteor.userId(), { fields: { username: 1, 'customFields.groupId': 1 } });
 						const newItems = Meteor.users.find({
 							$and: [
 								{
@@ -296,7 +300,9 @@ Template.messagePopupConfig.helpers({
 									},
 								},
 								{
-									groupId: { $in: [user && user.customFields && user.customFields.groupId, null] },
+									'customFields.groupId': {
+										$in: [groupId, null],
+									},
 								},
 							],
 						},
