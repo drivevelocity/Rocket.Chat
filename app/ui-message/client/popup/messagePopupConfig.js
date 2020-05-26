@@ -276,7 +276,7 @@ Template.messagePopupConfig.helpers({
 
 						items.push(...newItems);
 					} else {
-						const user = Meteor.users.findOne(Meteor.userId(), { fields: { username: 1 } });
+						const user = Meteor.users.findOne(Meteor.userId(), { fields: { username: 1, 'customFields.groupId': 1 } });
 						const newItems = Meteor.users.find({
 							$and: [
 								{
@@ -294,6 +294,9 @@ Template.messagePopupConfig.helpers({
 											...usernamesAlreadyFetched,
 										],
 									},
+								},
+								{
+									groupId: { $in: [user && user.customFields && user.customFields.groupId, null] },
 								},
 							],
 						},

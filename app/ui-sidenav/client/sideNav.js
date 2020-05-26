@@ -90,7 +90,7 @@ const redirectToDefaultChannelIfNeeded = () => {
 	if (room && room._id) {
 		FlowRouter.go(`/channel/${ firstChannelAfterLogin }`);
 	} else {
-		const privateRoom = Rooms.findOne({ t: 'p', 'customFields.storeGroupId': { $exists: true } });
+		const privateRoom = Rooms.findOne({ t: 'p', groupId: { $exists: true } });
 		if (privateRoom) {
 			FlowRouter.go(`/group/${ privateRoom.name }`);
 		}

@@ -72,6 +72,7 @@ Meteor.methods({
 		const canViewAnonymous = settings.get('Accounts_AllowAnonymousRead') === true;
 
 		const user = Meteor.user();
+		const { customFields: { groupId } = {} } = user;
 
 		if (type === 'channels') {
 			const sort = sortChannels(sortBy, sortDirection);
@@ -99,6 +100,7 @@ Meteor.methods({
 					usersCount: 1,
 					prid: 1,
 				},
+				groupId,
 			});
 
 			return {

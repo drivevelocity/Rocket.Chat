@@ -1,3 +1,4 @@
+import { Meteor } from 'meteor/meteor';
 import _ from 'underscore';
 import s from 'underscore.string';
 
@@ -25,6 +26,8 @@ export class Rooms extends Base {
 
 		// field used for DMs only
 		this.tryEnsureIndex({ uids: 1 }, { sparse: true });
+
+		this.tryEnsureIndex({ groupId: 1 });
 	}
 
 	findOneByIdOrName(_idOrName, options) {
@@ -305,11 +308,11 @@ export class Rooms extends Base {
 	// FIND
 
 	findById(roomId, options) {
-		return this.find({ _id: roomId }, options);
+		return this.findInGroup({ _id: roomId }, options);
 	}
 
 	findByIds(roomIds, options) {
-		return this.find({ _id: { $in: [].concat(roomIds) } }, options);
+		return this.findInGroup({ _id: { $in: [].concat(roomIds) } }, options);
 	}
 
 	findByType(type, options) {
@@ -326,7 +329,7 @@ export class Rooms extends Base {
 			t: type,
 		};
 
-		return this.find(query, options);
+		return this.findInGroup(query, options);
 	}
 
 	findByTypes(types, discussion = false, options = {}) {
@@ -336,13 +339,13 @@ export class Rooms extends Base {
 			},
 			prid: { $exists: discussion },
 		};
-		return this.find(query, options);
+		return this.findInGroup(query, options);
 	}
 
 	findByUserId(userId, options) {
 		const query = { 'u._id': userId };
 
-		return this.find(query, options);
+		return this.findInGroup(query, options);
 	}
 
 	findBySubscriptionUserId(userId, options) {
@@ -355,7 +358,7 @@ export class Rooms extends Base {
 			},
 		};
 
-		return this.find(query, options);
+		return this.findInGroup(query, options);
 	}
 
 	findBySubscriptionTypeAndUserId(type, userId, options) {
@@ -369,7 +372,7 @@ export class Rooms extends Base {
 			},
 		};
 
-		return this.find(query, options);
+		return this.findInGroup(query, options);
 	}
 
 	findBySubscriptionUserIdUpdatedAfter(userId, _updatedAt, options) {
@@ -385,7 +388,7 @@ export class Rooms extends Base {
 			},
 		};
 
-		return this.find(query, options);
+		return this.findInGroup(query, options);
 	}
 
 	findByNameContaining(name, discussion = false, options = {}) {
@@ -401,7 +404,7 @@ export class Rooms extends Base {
 				},
 			],
 		};
-		return this.find(query, options);
+		return this.findInGroup(query, options);
 	}
 
 	findByNameContainingAndTypes(name, types, discussion = false, options = {}) {
@@ -420,7 +423,7 @@ export class Rooms extends Base {
 				},
 			],
 		};
-		return this.find(query, options);
+		return this.findInGroup(query, options);
 	}
 
 	findByNameAndType(name, type, options) {
@@ -430,7 +433,7 @@ export class Rooms extends Base {
 		};
 
 		// do not use cache
-		return this._db.find(query, options);
+		return this.findNoCachedInGroup(query, options);
 	}
 
 	findByNameOrFNameAndType(name, type, options) {
@@ -444,7 +447,7 @@ export class Rooms extends Base {
 		};
 
 		// do not use cache
-		return this._db.find(query, options);
+		return this.findNoCachedInGroup(query, options);
 	}
 
 	findByNameAndTypeNotDefault(name, type, options) {
@@ -457,7 +460,7 @@ export class Rooms extends Base {
 		};
 
 		// do not use cache
-		return this._db.find(query, options);
+		return this.findNoCachedInGroup(query, options);
 	}
 
 	findByNameAndTypesNotInIds(name, types, ids, options) {
@@ -472,7 +475,7 @@ export class Rooms extends Base {
 		};
 
 		// do not use cache
-		return this._db.find(query, options);
+		return this.findNoCachedInGroup(query, options);
 	}
 
 	findChannelAndPrivateByNameStarting(name, options) {
@@ -485,7 +488,7 @@ export class Rooms extends Base {
 			name: nameRegex,
 		};
 
-		return this.find(query, options);
+		return this.findInGroup(query, options);
 	}
 
 	findByDefaultAndTypes(defaultValue, types, options) {
@@ -496,7 +499,7 @@ export class Rooms extends Base {
 			},
 		};
 
-		return this.find(query, options);
+		return this.findInGroup(query, options);
 	}
 
 	findDirectRoomContainingAllUsernames(usernames, options) {
@@ -547,7 +550,7 @@ export class Rooms extends Base {
 			t: type,
 		};
 
-		return this.find(query, options);
+		return this.findInGroup(query, options);
 	}
 
 	findByTypeInIdsAndNameContaining(type, ids, name, options) {
@@ -561,7 +564,7 @@ export class Rooms extends Base {
 			t: type,
 		};
 
-		return this.find(query, options);
+		return this.findInGroup(query, options);
 	}
 
 	findByTypeAndArchivationState(type, archivationstate, options) {
@@ -573,18 +576,18 @@ export class Rooms extends Base {
 			query.archived = { $ne: true };
 		}
 
-		return this.find(query, options);
+		return this.findInGroup(query, options);
 	}
 
 	findGroupDMsByUids(uids, options) {
-		return this.find({
+		return this.findInGroup({
 			usersCount: { $gt: 2 },
 			uids,
 		}, options);
 	}
 
 	find1On1ByUserId(userId, options) {
-		return this.find({
+		return this.findInGroup({
 			uids: userId,
 			usersCount: 2,
 		}, options);
@@ -1136,6 +1139,37 @@ export class Rooms extends Base {
 
 	countDiscussions() {
 		return this.find({ prid: { $exists: true } }).count();
+	}
+
+	findNoCachedInGroup(query, options) {
+		const groupId = this.getGroupId();
+		if (groupId) {
+			query.groupId = groupId;
+		}
+
+		// do not use cache
+		return this._db.find(query, options);
+	}
+
+	findInGroup(query, options) {
+		const groupId = this.getGroupId();
+		if (groupId) {
+			query.groupId = groupId;
+		}
+
+		return this.find(query, options);
+	}
+
+	getGroupId() {
+		if (Meteor.isServer) {
+			try {
+				const { customFields: { groupId } = {} } = Meteor.user();
+				return groupId;
+			} catch (e) {
+				return null;
+			}
+		}
+		return null;
 	}
 }
 

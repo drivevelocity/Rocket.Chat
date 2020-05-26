@@ -24,7 +24,7 @@ export const createRoom = function(type, name, owner, members = [], readOnly, ex
 		throw new Meteor.Error('error-invalid-name', 'Invalid name', { function: 'RocketChat.createRoom' });
 	}
 
-	owner = Users.findOneByUsernameIgnoringCase(owner, { fields: { username: 1 } });
+	owner = Users.findOneByUsernameIgnoringCase(owner, { fields: { username: 1, customFields: 1 } });
 
 	if (!owner) {
 		throw new Meteor.Error('error-invalid-user', 'Invalid user', { function: 'RocketChat.createRoom' });
@@ -47,8 +47,11 @@ export const createRoom = function(type, name, owner, members = [], readOnly, ex
 		validRoomNameOptions.nameValidationRegex = options.nameValidationRegex;
 	}
 
+	let { customFields: { groupId = null } = {} } = extraData;
+	groupId || ({ customFields: { groupId = '' } = {} } = owner);
+
 	let room = {
-		name: getValidRoomName(name, null, validRoomNameOptions),
+		name: getValidRoomName(`${ name }-${ groupId }`, null, validRoomNameOptions),
 		fname: name,
 		t: type,
 		msgs: 0,
@@ -60,6 +63,7 @@ export const createRoom = function(type, name, owner, members = [], readOnly, ex
 		...extraData,
 		ts: now,
 		ro: readOnly === true,
+		groupId,
 	};
 
 	if (Apps && Apps.isLoaded()) {
