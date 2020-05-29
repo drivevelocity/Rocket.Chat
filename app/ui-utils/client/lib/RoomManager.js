@@ -154,7 +154,8 @@ export const RoomManager = new function() {
 				delete openedRooms[typeName];
 
 				if (rid != null) {
-					return RoomHistoryManager.clear(rid);
+					RoomHistoryManager.clear(rid);
+					return FlowRouter.go('home');
 				}
 			}
 		}

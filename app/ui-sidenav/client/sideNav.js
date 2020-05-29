@@ -90,7 +90,8 @@ const redirectToDefaultChannelIfNeeded = () => {
 	if (room && room._id) {
 		FlowRouter.go(`/channel/${ firstChannelAfterLogin }`);
 	} else {
-		const privateRoom = Rooms.findOne({ t: 'p', groupId: { $exists: true } });
+		const { customFields: { groupId } = {} } = Meteor.user() || {};
+		const privateRoom = Rooms.findOne({ t: 'p', 'customFields.groupId': groupId });
 		if (privateRoom) {
 			FlowRouter.go(`/group/${ privateRoom.name }`);
 		}
