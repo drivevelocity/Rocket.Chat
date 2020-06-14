@@ -1,6 +1,7 @@
 import { Notifications } from '../../../app/notifications';
-import { Subscriptions, Users } from '../../../app/models';
+import { Subscriptions } from '../../../app/models';
 import { msgStream } from '../../../app/lib/server/lib/msgStream';
+import { notifyStream, shouldNotifyStream } from '../../../app/lib/server/functions/notifications/stream';
 
 import { fields } from '.';
 
@@ -28,14 +29,7 @@ Subscriptions.on('change', ({ clientAction, id, data }) => {
 		data,
 	);
 
-	const { customFields } = Users.findOne(data.u._id, { fields: { customFields: 1 } }) || {};
-	if (customFields)	{
-		data.u.customFields = customFields;
-		Notifications.notifyAdmin(
-			data.u._id,
-			'subscriptions-changed',
-			clientAction,
-			data,
-		);
+	if (shouldNotifyStream()) {
+		notifyStream(data.u._id);
 	}
 });
