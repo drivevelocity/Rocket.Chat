@@ -18,10 +18,12 @@ const mention = new MentionsServer({
 		const fields = { fields: { _id: 1, name: 1 } };
 		const query = { name: { $in: _.unique(channels) }, t: { $in: ['c', 'p'] } };
 
-		const { customFields: { groupId } = {} } = Meteor.user() || {};
-		if (groupId) {
-			query.groupId = { $in: [groupId, null] };
-		}
+		try {
+			const { customFields: { groupId } = {} } = Meteor.user() || {};
+			if (groupId) {
+				query.groupId = { $in: [groupId, null] };
+			}
+		} catch { /**/ }
 
 		Rooms.find(query, fields).fetch();
 	},
@@ -29,10 +31,12 @@ const mention = new MentionsServer({
 		const fields = { _id: true, username: true, name: 1 };
 		const query = { username: { $in: _.unique(usernames) } };
 
-		const { customFields: { groupId } = {} } = Meteor.user() || {};
-		if (groupId) {
-			query['customFields.groupId'] = { $in: [groupId, null] };
-		}
+		try {
+			const { customFields: { groupId } = {} } = Meteor.user() || {};
+			if (groupId) {
+				query['customFields.groupId'] = { $in: [groupId, null] };
+			}
+		} catch { /**/ }
 
 		const result = Meteor.users.find(query, fields).fetch();
 		return result;
