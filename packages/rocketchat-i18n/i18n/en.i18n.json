@@ -3620,6 +3620,8 @@
   "view-d-room": "View Direct Messages",
   "view-d-room_description": "Permission to view direct messages",
   "view-full-other-user-info": "View Full Other User Info",
+  "view-full-other-user-info_created_at": "View Created At field",
+  "view-full-other-user-info_last_login": "View Last Login field",
   "view-full-other-user-info_description": "Permission to view full profile of other users including account creation date, last login, etc.",
   "view-history": "View History",
   "view-history_description": "Permission to view the channel history",
