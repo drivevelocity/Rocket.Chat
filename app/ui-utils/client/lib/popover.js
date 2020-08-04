@@ -182,10 +182,6 @@ Template.popover.events({
 		const { rid, name, template } = instance.data.data;
 		const action = e.currentTarget.dataset.id;
 
-		if (action === 'hide') {
-			hide(template, rid, name);
-		}
-
 		if (action === 'leave') {
 			leave(template, rid, name);
 		}
