@@ -79,7 +79,8 @@ Template.userInfo.helpers({
 	},
 
 	username() {
-		return '';
+		const user = Template.instance().user.get();
+		return user && user.username;
 	},
 
 	userStatus() {

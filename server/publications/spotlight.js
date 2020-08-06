@@ -20,7 +20,7 @@ function fetchRooms(userId, rooms) {
 
 Meteor.methods({
 	spotlight(text, usernames, type = { users: true, rooms: true }, rid) {
-		const { customFields: { groupId } } = Meteor.user() || {};
+		const { customFields: { groupId = null } = {} } = Meteor.user() || {};
 		const searchForChannels = text[0] === '#';
 		const searchForDMs = text[0] === '@';
 		if (searchForChannels) {
