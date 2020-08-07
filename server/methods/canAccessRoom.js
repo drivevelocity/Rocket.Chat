@@ -47,12 +47,6 @@ Meteor.methods({
 			return room;
 		}
 
-		if (!userId && settings.get('Accounts_AllowAnonymousRead') === false) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
-				method: 'canAccessRoom',
-			});
-		}
-
 		return false;
 	},
 });
