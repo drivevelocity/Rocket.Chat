@@ -290,8 +290,11 @@ export class Rooms extends Base {
 		return this.findOne(query);
 	}
 
-	findOneByDisplayName(fname, options) {
+	findOneByDisplayName(fname, options = {}) {
 		const query = { fname };
+		if (options.groupId) {
+			query.groupId = options.groupId;
+		}
 
 		return this.findOne(query, options);
 	}

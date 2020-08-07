@@ -49,9 +49,10 @@ export const createRoom = function(type, name, owner, members = [], readOnly, ex
 
 	let { customFields: { groupId = null } = {} } = extraData;
 	groupId || ({ customFields: { groupId = '' } = {} } = owner);
+	validRoomNameOptions.groupId = groupId;
 
 	let room = {
-		name: getValidRoomName(`${ name }-${ groupId }`, null, validRoomNameOptions),
+		name: getValidRoomName(name, null, validRoomNameOptions),
 		fname: name,
 		t: type,
 		msgs: 0,
