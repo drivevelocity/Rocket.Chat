@@ -17,11 +17,9 @@ function Open(command, params /* , item*/) {
 
 	let room = params.trim();
 	const type = dict[room[0]];
+	const isDirect = type && type[0] === 'd';
 	room = room.replace(/#|@/, '');
-
-	const query = {
-		name: room,
-	};
+	const query = {};
 
 	if (type) {
 		query.t = {
@@ -29,22 +27,22 @@ function Open(command, params /* , item*/) {
 		};
 	}
 
-	const subscription = ChatSubscription.findOne(query);
+	if (isDirect) {
+		query.name = room;
+		return Meteor.call('createDirectMessage', room, function(err) {
+			if (err) {
+				return;
+			}
+			const subscription = Subscriptions.findOne(query);
+			roomTypes.openRouteLink(subscription.t, subscription, FlowRouter.current().queryParams);
+		});
+	}
 
+	query.fname = room;
+	const subscription = ChatSubscription.findOne(query);
 	if (subscription) {
 		roomTypes.openRouteLink(subscription.t, subscription, FlowRouter.current().queryParams);
 	}
-
-	if (type && type.indexOf('d') === -1) {
-		return;
-	}
-	return Meteor.call('createDirectMessage', room, function(err) {
-		if (err) {
-			return;
-		}
-		const subscription = Subscriptions.findOne(query);
-		roomTypes.openRouteLink(subscription.t, subscription, FlowRouter.current().queryParams);
-	});
 }
 
 slashCommands.add('open', Open, {

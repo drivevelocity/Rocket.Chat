@@ -17,7 +17,7 @@ function Join(command, params, item) {
 	}
 	channel = channel.replace('#', '');
 	const user = Meteor.users.findOne(Meteor.userId());
-	const room = Rooms.findOneByNameAndType(channel, 'c');
+	const room = Rooms.findOneByDisplayNameAndType(channel, 'c');
 	if (!room) {
 		Notifications.notifyUser(Meteor.userId(), 'message', {
 			_id: Random.id(),
@@ -28,6 +28,8 @@ function Join(command, params, item) {
 				sprintf: [channel],
 			}, user.language),
 		});
+
+		return;
 	}
 
 	const subscription = Subscriptions.findOneByRoomIdAndUserId(room._id, user._id, { fields: { _id: 1 } });

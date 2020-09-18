@@ -308,6 +308,15 @@ export class Rooms extends Base {
 		return this.findOne(query, options);
 	}
 
+	findOneByDisplayNameAndType(fname, type, options) {
+		const query = {
+			fname,
+			t: type,
+		};
+
+		return this.findOneInGroup(query, options);
+	}
+
 	// FIND
 
 	findById(roomId, options) {
@@ -1161,6 +1170,15 @@ export class Rooms extends Base {
 		}
 
 		return this.find(query, options);
+	}
+
+	findOneInGroup(query, options) {
+		const groupId = this.getGroupId();
+		if (groupId) {
+			query.groupId = groupId;
+		}
+
+		return this.findOne(query, options);
 	}
 
 	getGroupId() {
