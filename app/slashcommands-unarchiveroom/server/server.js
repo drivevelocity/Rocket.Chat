@@ -21,7 +21,7 @@ function Unarchive(command, params, item) {
 		channel = room.name;
 	} else {
 		channel = channel.replace('#', '');
-		room = Rooms.findOneByName(channel);
+		room = Rooms.findOneByDisplayName(channel);
 	}
 
 	const user = Meteor.users.findOne(Meteor.userId());

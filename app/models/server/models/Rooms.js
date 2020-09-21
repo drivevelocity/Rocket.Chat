@@ -296,7 +296,7 @@ export class Rooms extends Base {
 			query.groupId = options.groupId;
 		}
 
-		return this.findOne(query, options);
+		return this.findOneInGroup(query, options);
 	}
 
 	findOneByNameAndType(name, type, options) {

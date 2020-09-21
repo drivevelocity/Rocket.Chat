@@ -26,8 +26,8 @@ function inviteAll(type) {
 		}
 		const userId = Meteor.userId();
 		const currentUser = Meteor.users.findOne(userId);
-		const baseChannel = type === 'to' ? Rooms.findOneById(item.rid) : Rooms.findOneByName(channel);
-		const targetChannel = type === 'from' ? Rooms.findOneById(item.rid) : Rooms.findOneByName(channel);
+		const baseChannel = type === 'to' ? Rooms.findOneById(item.rid) : Rooms.findOneByDisplayName(channel);
+		const targetChannel = type === 'from' ? Rooms.findOneById(item.rid) : Rooms.findOneByDisplayName(channel);
 
 		if (!baseChannel) {
 			return Notifications.notifyUser(userId, 'message', {
